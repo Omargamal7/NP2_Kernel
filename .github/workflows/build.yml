@@ -47,10 +47,6 @@ on:
         type: string
         default: 'vendor/waipio_GKI.config vendor/nothing/waipio_GKI.config vendor/debugfs.config'
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   build:
     runs-on: ubuntu-latest
