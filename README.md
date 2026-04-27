@@ -5,6 +5,8 @@ Custom kernel for **Nothing Phone 2 (Pong)** with root and hiding built in.
 Based on [LineageOS kernel](https://github.com/LineageOS/android_kernel_nothing_sm8475.git) (android13-5.10, sublevel 246).
 Integrates [ReSukiSU](https://github.com/ReSukiSU/ReSukiSU) for root and [SuSFS](https://gitlab.com/simonpunk/susfs4ksu) for hiding.
 
+Also the [Releases](https://github.com/MiguVT/NP2_Kernel/releases) could include builds for other kernels (e.g arter97), the workflow of them are based on the main one but with some changes, you can find them in the [branches](https://github.com/MiguVT/NP2_Kernel/branches)
+
 ## Features
 
 - **[ReSukiSU](https://github.com/ReSukiSU/ReSukiSU)**: Kernel-level root (SukiSU-Ultra fork)
