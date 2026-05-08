@@ -36,7 +36,7 @@ jobs:
       kernel_branch: master
       kernel_defconfig: /defconfig
       extra_configs: ''
-      susfs_branch: gki-android12-5.10
+      susfs_branch: gki-android13-5.10
       extra_patches_dir: patches/arter97
       kpm_support: ${{ inputs.kpm_support }}
       susfs_support: ${{ inputs.susfs_support }}
