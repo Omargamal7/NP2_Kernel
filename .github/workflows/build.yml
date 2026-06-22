@@ -62,6 +62,16 @@ on:
         required: false
         type: string
         default: 'LineageOS'
+      base_boot_url:
+        description: 'Direct HTTPS URL to the exact stock boot.img for this ROM build. Leave empty to skip boot.img creation.'
+        required: false
+        type: string
+        default: ''
+      base_boot_sha256:
+        description: 'Required SHA-256 for base_boot_url. Leave empty only when base_boot_url is empty.'
+        required: false
+        type: string
+        default: ''
 
   workflow_call:
     inputs:
@@ -110,6 +120,14 @@ on:
         required: false
         type: string
         default: 'LineageOS'
+      base_boot_url:
+        required: false
+        type: string
+        default: ''
+      base_boot_sha256:
+        required: false
+        type: string
+        default: ''
 
 jobs:
   build:
@@ -236,11 +254,46 @@ jobs:
         run: |
           KERNEL_TYPE="${{ inputs.kernel_type || 'LineageOS' }}" Scripts/package_anykernel.sh
 
+      - name: Build boot image from verified base image
+        if: ${{ inputs.base_boot_url != '' }}
+        env:
+          BASE_BOOT_URL: ${{ inputs.base_boot_url }}
+          BASE_BOOT_SHA256: ${{ inputs.base_boot_sha256 }}
+        run: |
+          if [ -z "$BASE_BOOT_SHA256" ]; then
+            echo 'base_boot_sha256 is required when base_boot_url is set' >&2
+            exit 1
+          fi
+          case "$BASE_BOOT_URL" in
+            https://*) ;;
+            *) echo 'base_boot_url must use HTTPS' >&2; exit 1 ;;
+          esac
+          curl --fail --location --retry 3 --output base-boot.img "$BASE_BOOT_URL"
+          printf '%s  %s\n' "$BASE_BOOT_SHA256" base-boot.img | sha256sum --check --strict
+          KERNEL_TYPE="${{ inputs.kernel_type || 'LineageOS' }}" \
+          Scripts/repack_boot_image.sh base-boot.img \
+          "boot-${{ inputs.kernel_type || 'LineageOS' }}-NP2-ReSukiSU.img"
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: kernel-${{ inputs.kernel_type || 'LineageOS' }}-NP2-ReSukiSU
           path: "kernel-${{ inputs.kernel_type || 'LineageOS' }}-NP2-ReSukiSU.zip"
+          retention-days: 30
+
+      - name: Upload raw kernel image
+        uses: actions/upload-artifact@v4
+        with:
+          name: image-${{ inputs.kernel_type || 'LineageOS' }}-NP2-ReSukiSU
+          path: kernel/out/arch/arm64/boot/Image
+          retention-days: 30
+
+      - name: Upload repacked boot image
+        if: ${{ inputs.base_boot_url != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: boot-${{ inputs.kernel_type || 'LineageOS' }}-NP2-ReSukiSU
+          path: boot-${{ inputs.kernel_type || 'LineageOS' }}-NP2-ReSukiSU.img
           retention-days: 30
 
       - name: Upload .config for debugging
