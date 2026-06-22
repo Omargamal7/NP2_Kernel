@@ -6,6 +6,27 @@ permissions:
 
 on:
   workflow_dispatch:
+    inputs:
+      lineage_base_boot_url:
+        description: 'Direct HTTPS URL to the exact LineageOS boot.img. Leave empty to skip a LineageOS boot.img artifact.'
+        required: false
+        type: string
+        default: ''
+      lineage_base_boot_sha256:
+        description: 'SHA-256 for lineage_base_boot_url.'
+        required: false
+        type: string
+        default: ''
+      nothingoss_base_boot_url:
+        description: 'Direct HTTPS URL to the exact NothingOS boot.img. Leave empty to skip a NothingOS boot.img artifact.'
+        required: false
+        type: string
+        default: ''
+      nothingoss_base_boot_sha256:
+        description: 'SHA-256 for nothingoss_base_boot_url.'
+        required: false
+        type: string
+        default: ''
 
 jobs:
   build-default:
@@ -17,6 +38,8 @@ jobs:
       susfs_support: true
       bbg_support: true
       susfs_force: false
+      base_boot_url: ${{ inputs.lineage_base_boot_url }}
+      base_boot_sha256: ${{ inputs.lineage_base_boot_sha256 }}
 
   build-nothingoss:
     name: Build (NothingOSS)
@@ -32,6 +55,8 @@ jobs:
       susfs_support: true
       susfs_force: false
       bbg_support: true
+      base_boot_url: ${{ inputs.nothingoss_base_boot_url }}
+      base_boot_sha256: ${{ inputs.nothingoss_base_boot_sha256 }}
 
   # COMMENTED CAUSE IT DOESN'T BUILD, NEEDS FIXING
   # build-arter97:
